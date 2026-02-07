@@ -108,6 +108,7 @@ function normalizeAnalysis(raw: any): any {
     raw.decisions = raw.decisions.map((decision: any) => ({
       ...decision,
       amountEth: clampAmountEth(decision?.amountEth),
+      position: normalizePosition(decision?.position),
     }));
   }
 
@@ -119,6 +120,11 @@ function clampAmountEth(value: unknown): number {
   if (amount < 0.001) return 0.001;
   if (amount > 0.1) return 0.1;
   return amount;
+}
+
+function normalizePosition(value: unknown): 'YES' | 'NO' {
+  if (value === 'YES' || value === 'NO') return value;
+  return 'YES';
 }
 
 /**

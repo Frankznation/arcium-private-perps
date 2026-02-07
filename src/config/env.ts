@@ -34,7 +34,7 @@ export const config = {
 
   // Agent Config
   minEthBalance: parseFloat(process.env.MIN_ETH_BALANCE || '0.01'),
-  loopIntervalMs: parseInt(process.env.LOOP_INTERVAL_MS || '900000', 10),
+  loopIntervalMs: parseInt(process.env.LOOP_INTERVAL_MS || '180000', 10),
   maxPositionSize: parseFloat(process.env.MAX_POSITION_SIZE || '0.1'),
   stopLossBps: parseInt(process.env.STOP_LOSS_BPS || '1500', 10),
   takeProfitBps: parseInt(process.env.TAKE_PROFIT_BPS || '3000', 10),
@@ -60,6 +60,28 @@ export const config = {
     return Number.isNaN(num) ? undefined : num;
   })(),
   ethUsdPrice: parseFloat(process.env.ETH_USD_PRICE || '3000'),
+
+  // Opinion Lab (opinion.trade) - alternative prediction market
+  useOpinionLab: process.env.USE_OPINION_LAB === 'true',
+  opinionApiBaseUrl: process.env.OPINION_API_BASE_URL || 'https://openapi.opinion.trade/openapi',
+  opinionApiKey: process.env.OPINION_API_KEY || '',
+
+  // Polymarket - Gamma (markets) + CLOB (prices + real trading)
+  usePolymarket: process.env.USE_POLYMARKET === 'true',
+  polymarketGammaUrl: process.env.POLYMARKET_GAMMA_URL || 'https://gamma-api.polymarket.com',
+  polymarketClobUrl: process.env.POLYMARKET_CLOB_URL || 'https://clob.polymarket.com',
+  polymarketTradingEnabled: process.env.POLYMARKET_TRADING_ENABLED === 'true',
+  polymarketChainId: parseInt(process.env.POLYMARKET_CHAIN_ID || '137', 10),
+  polymarketFunderAddress: process.env.POLYMARKET_FUNDER_ADDRESS?.trim() || '',
+  polymarketSignatureType: parseInt(process.env.POLYMARKET_SIGNATURE_TYPE || '0', 10),
+  polymarketApiKey: process.env.POLYMARKET_API_KEY || '',
+  polymarketApiSecret: process.env.POLYMARKET_API_SECRET || '',
+  polymarketApiPassphrase: process.env.POLYMARKET_API_PASSPHRASE || '',
+
+  // PredictBase - prediction markets on Base (https://predictbase.app)
+  usePredictBase: process.env.USE_PREDICTBASE === 'true',
+  predictBaseApiUrl: process.env.PREDICTBASE_API_URL || 'https://api.predictbase.app',
+  predictBaseApiKey: process.env.PREDICTBASE_API_KEY || '',
 
   // News
   newsFeeds: (process.env.NEWS_FEEDS || 'https://feeds.feedburner.com/CoinDesk')
@@ -105,9 +127,13 @@ export function validateConfig(): void {
     missing.push('DATABASE_URL or SUPABASE_URL + SUPABASE_KEY');
   }
 
-  if (process.env.LIMITLESS_TRADING_ENABLED === 'true') {
+  if (process.env.USE_PREDICTBASE === 'true') {
+    if (!process.env.PREDICTBASE_API_KEY) missing.push('PREDICTBASE_API_KEY');
+  }
+
+  // Only require/warn Limitless vars when actually using Limitless for trading
+  if (process.env.LIMITLESS_TRADING_ENABLED === 'true' && process.env.USE_POLYMARKET !== 'true' && process.env.USE_OPINION_LAB !== 'true' && process.env.USE_PREDICTBASE !== 'true') {
     if (!process.env.LIMITLESS_USDC_ADDRESS) missing.push('LIMITLESS_USDC_ADDRESS');
-    // If LIMITLESS_OWNER_ID is set but not a valid number, warn (config normalizes it to undefined)
     const rawOwnerId = process.env.LIMITLESS_OWNER_ID?.trim();
     if (rawOwnerId) {
       const n = parseInt(rawOwnerId, 10);

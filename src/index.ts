@@ -286,7 +286,8 @@ async function executeTradingDecisions(decisions: Array<{
             tradeToClose.position,
             tradeToClose.entry_price,
             currentPrice,
-            amountUsd
+            amountUsd,
+            tradeToClose.market_id
           );
 
           const pnlBps = Math.round(((currentPrice - tradeToClose.entry_price) / tradeToClose.entry_price) * 10000);
@@ -537,17 +538,22 @@ export async function runOneIteration(): Promise<{ ok: boolean; message: string 
     await postDailySummary();
 
     try {
-      const roundParams = {
-        portfolioEth: portfolioValue,
-        openPositions: openTrades.length,
-        marketsScanned: marketData.markets.length,
-        decisionsCount: analysis.decisions.length,
-        tradesExecuted,
-        hasCommentary: Boolean(analysis.marketCommentary?.trim()),
-      };
-      const castContent = generateRoundSummaryForPlatform(roundParams, 'FARCASTER');
-      await postCastWithRateLimit(castContent);
-      logger.info('Round summary posted to Farcaster');
+      if (!config.farcaster.signerUuid) {
+        logger.warn('Skipping Farcaster round summary: FARCASTER_SIGNER_UUID not set');
+      } else {
+        const roundParams = {
+          portfolioEth: portfolioValue,
+          openPositions: openTrades.length,
+          marketsScanned: marketData.markets.length,
+          decisionsCount: analysis.decisions.length,
+          tradesExecuted,
+          hasCommentary: Boolean(analysis.marketCommentary?.trim()),
+        };
+        const castContent = generateRoundSummaryForPlatform(roundParams, 'FARCASTER');
+        logger.info('Posting round summary to Farcaster...');
+        await postCastWithRateLimit(castContent);
+        logger.info('Round summary posted to Farcaster');
+      }
     } catch (roundErr) {
       logger.error(`Failed to post round summary: ${roundErr}`);
     }
@@ -589,7 +595,12 @@ export async function runAgentOnce(): Promise<{ ok: boolean; message: string }> 
 async function autonomousLoop(): Promise<void> {
   logger.info('🦀 CrabTrader agent starting...');
   logger.info(`Loop interval: ${config.loopIntervalMs / 1000}s`);
-  logger.info(`Limitless real trading: ${config.limitlessTradingEnabled ? 'ON' : 'OFF (mock only)'}`);
+  logger.info(`Market source: ${config.usePredictBase ? 'PredictBase' : config.usePolymarket ? 'Polymarket' : config.useOpinionLab ? 'Opinion Lab' : 'Limitless'}`);
+  if (config.usePolymarket) {
+    logger.info(`Polymarket real trading: ${config.polymarketTradingEnabled ? 'ON' : 'OFF (mock only)'}`);
+  } else if (!config.useOpinionLab) {
+    logger.info(`Limitless real trading: ${config.limitlessTradingEnabled ? 'ON' : 'OFF (mock only)'}`);
+  }
 
   while (isRunning) {
     await runOneIteration();
@@ -609,6 +620,12 @@ async function main(): Promise<void> {
     // Initialize wallet
     initializeWallet();
     logger.info('Wallet initialized');
+
+    if (config.farcaster.signerUuid) {
+      logger.info('Farcaster posting: ENABLED (FARCASTER_SIGNER_UUID set)');
+    } else {
+      logger.warn('Farcaster posting: DISABLED — set FARCASTER_SIGNER_UUID in env to post casts');
+    }
 
     // Optional launch announcement
     if (config.postLaunchAnnouncement) {

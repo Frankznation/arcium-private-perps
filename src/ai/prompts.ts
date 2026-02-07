@@ -50,9 +50,10 @@ ${openPositions.map((pos, i) =>
    P&L: ${(pos.pnlBps / 100).toFixed(2)}%`
 ).join('\n')}
 
-AVAILABLE MARKETS:
+AVAILABLE MARKETS (use the exact "id" as marketId in your JSON):
 ${availableMarkets.map((m, i) => 
-  `${i + 1}. ${m.name}
+  `${i + 1}. id: ${m.id}
+   name: ${m.name}
    YES: ${(m.yesPrice / 100).toFixed(2)}% | NO: ${(m.noPrice / 100).toFixed(2)}%
    Volume 24h: $${m.volume24h.toLocaleString()}`
 ).join('\n')}
@@ -80,8 +81,8 @@ OUTPUT FORMAT (JSON):
   "decisions": [
     {
       "action": "BUY" | "SELL" | "HOLD",
-      "marketId": "string (MUST be the exact id/slug from AVAILABLE MARKETS above)",
-      "marketName": "string (MUST be the exact name from AVAILABLE MARKETS above)",
+      "marketId": "string (MUST be the exact 'id' value from AVAILABLE MARKETS, e.g. 0x... or conditionId - NOT the name)",
+      "marketName": "string (exact name from AVAILABLE MARKETS)",
       "position": "YES" | "NO",
       "amountEth": number (0.001 to 0.1),
       "reasoning": "string (2-3 sentences)",
@@ -93,7 +94,7 @@ OUTPUT FORMAT (JSON):
   "riskAssessment": "string (current risk level: LOW/MEDIUM/HIGH)"
 }
 
-CRITICAL: For every BUY or SELL decision, copy marketId and marketName exactly from the AVAILABLE MARKETS list. Do not invent or modify them.
+CRITICAL: For every BUY or SELL decision, set marketId to the exact "id" value from AVAILABLE MARKETS (the id: ... line). Set marketName to the exact "name" from that market. Never use the market name as marketId. Set position to "YES" or "NO" only (never "none" or empty).
 
 Analyze the markets and provide your trading decisions. Be strategic, risk-aware, and true to your crab personality.`;
 }

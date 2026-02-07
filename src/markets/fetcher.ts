@@ -2,6 +2,9 @@ import { logger } from '../utils/logger';
 import type { PredictionMarket, MarketData } from './types';
 import { config } from '../config/env';
 import { retry } from '../utils/helpers';
+import { fetchOpinionMarkets } from './opinion';
+import { fetchPolymarketMarkets } from './polymarket';
+import { fetchPredictBaseMarkets } from './predictbase';
 
 /** Limitless slug format: lowercase, hyphens, digits; no spaces/emojis/special chars */
 function isValidLimitlessSlug(s: string): boolean {
@@ -19,6 +22,19 @@ function isValidLimitlessSlug(s: string): boolean {
  * Options: Polymarket API, Kalshi API, or onchain contracts
  */
 export async function fetchMarkets(): Promise<MarketData> {
+  if (config.usePredictBase) {
+    logger.debug('Fetching prediction market data (PredictBase)...');
+    return fetchPredictBaseMarkets();
+  }
+  if (config.usePolymarket) {
+    logger.debug('Fetching prediction market data (Polymarket)...');
+    return fetchPolymarketMarkets();
+  }
+  if (config.useOpinionLab) {
+    logger.debug('Fetching prediction market data (Opinion Lab)...');
+    return fetchOpinionMarkets();
+  }
+
   logger.debug('Fetching prediction market data (Limitless)...');
 
   const baseUrl = config.limitlessApiBaseUrl.replace(/\/$/, '');
