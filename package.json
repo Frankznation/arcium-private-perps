@@ -1,0 +1,48 @@
+{
+  "name": "crab-trader-agent",
+  "version": "1.0.0",
+  "description": "Autonomous AI agent that trades on Base prediction markets and mints NFTs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "deploy:contract": "ts-node scripts/deploy.ts",
+    "deploy:hardhat": "hardhat run scripts/deploy-hardhat.js --network base",
+    "compile": "hardhat compile",
+    "typecheck": "tsc --noEmit",
+    "test:profile": "ts-node scripts/test-profile-api.ts",
+    "check:status": "ts-node scripts/check-agent-status.ts"
+  },
+  "keywords": [
+    "blockchain",
+    "base",
+    "ai",
+    "trading",
+    "nft",
+    "autonomous-agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
+    "@neynar/nodejs-sdk": "^2.0.0",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@supabase/supabase-js": "^2.39.3",
+    "dotenv": "^16.4.1",
+    "ethers": "^6.11.1",
+    "twitter-api-v2": "^1.15.1",
+    "viem": "^2.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@types/node": "^20.11.5",
+    "hardhat": "^2.19.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
