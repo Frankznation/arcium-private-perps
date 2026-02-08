@@ -38,11 +38,24 @@ export function formatBps(bps: number): string {
   return `${sign}${percent}%`;
 }
 
+/** Base tx hash: 0x + 64 hex chars. Order IDs from PredictBase/Polymarket are not valid. */
+export function isValidBasescanTxHash(txHash: string): boolean {
+  return /^0x[0-9a-fA-F]{64}$/.test((txHash || '').trim());
+}
+
 /**
- * Generate Basescan transaction URL
+ * Generate Basescan transaction URL (only for real on-chain tx hashes)
  */
 export function getBasescanUrl(txHash: string): string {
   return `https://basescan.org/tx/${txHash}`;
+}
+
+/**
+ * Return Basescan tx URL if value is a real tx hash; otherwise return null.
+ * Use this for posts so we don't link order IDs to Basescan (which would error).
+ */
+export function getBasescanTxLinkIfValid(txHash: string): string | null {
+  return isValidBasescanTxHash(txHash) ? getBasescanUrl(txHash) : null;
 }
 
 /**

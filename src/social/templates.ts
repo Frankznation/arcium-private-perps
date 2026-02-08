@@ -1,4 +1,4 @@
-import { getBasescanUrl } from '../utils/helpers';
+import { getBasescanTxLinkIfValid } from '../utils/helpers';
 import { formatBps, formatEth } from '../utils/helpers';
 
 export type SocialPlatform = 'TWITTER' | 'FARCASTER';
@@ -92,7 +92,8 @@ export function generateTradeEntryPostForPlatform(
   platform: SocialPlatform
 ): string {
   const pricePercent = (params.price / 100).toFixed(2);
-  const txUrl = getBasescanUrl(params.txHash);
+  const txLink = getBasescanTxLinkIfValid(params.txHash);
+  const txLine = txLink ? `Tx: ${txLink}` : (params.txHash ? `Order ID: ${params.txHash}` : '');
   const confidencePercent = Math.round(params.confidence);
   const shortReason = params.reasoning.trim();
   void params.timestamp;
@@ -108,9 +109,7 @@ export function generateTradeEntryPostForPlatform(
 🚀 Conviction: ${confidencePercent}% 
 
 ${shortReason}
-
-Tx: ${txUrl}
-
+${txLine ? `\n${txLine}\n\n` : '\n'}
 The crab commits, but keeps a claw on risk.`;
 
   const classicBody = `🦀 New position opened!
@@ -119,8 +118,7 @@ Market: ${params.marketName}
 Position: ${params.position}
 Entry: ${pricePercent}%
 Size: ${formatEth(params.amountEth)}
-
-${txUrl}
+${txLine ? `\n${txLine}\n` : ''}
 
 #Base #OnChain #CrabTrader
 
@@ -144,7 +142,8 @@ export function generateTradeExitPostForPlatform(
   const entryPercent = (params.entryPrice / 100).toFixed(2);
   const exitPercent = (params.exitPrice / 100).toFixed(2);
   const pnl = formatBps(params.pnlBps);
-  const txUrl = getBasescanUrl(params.txHash);
+  const txLink = getBasescanTxLinkIfValid(params.txHash);
+  const txLine = txLink ? `Tx: ${txLink}` : (params.txHash ? `Order ID: ${params.txHash}` : '');
 
   const isWin = params.pnlBps > 0;
   const winLossEmoji = isWin ? '💰' : '⚠️';
@@ -163,9 +162,7 @@ P&L: ${outcome} ${pnl}
 💰 Size: ${formatEth(params.amountEth)}
 
 Reason: ${params.exitReason}
-
-Tx: ${txUrl}
-
+${txLine ? `\n${txLine}\n\n` : '\n'}
 Crab lesson: tighten the claws, keep the edge.`;
 
   const classicBody = `🦀 Position closed
@@ -175,7 +172,7 @@ P&L: ${pnl}
 Size: ${formatEth(params.amountEth)}
 Reason: ${params.exitReason}
 Time: ${formatTimestampUtc(params.timestamp)}
-Tx: ${txUrl}`;
+${txLine ? `${txLine}` : ''}`;
 
   const body = platform === 'FARCASTER' ? farcasterBody : classicBody;
   return trimForPlatform(body, platform);
@@ -194,7 +191,8 @@ export function generateNFTPostForPlatform(
 ): string {
   const pnl = formatBps(params.pnlBps);
   const emoji = params.pnlBps > 0 ? '🎉' : '💥';
-  const txUrl = getBasescanUrl(params.txHash);
+  const txLink = getBasescanTxLinkIfValid(params.txHash);
+  const txLine = txLink ? txLink : (params.txHash ? `Order ID: ${params.txHash}` : '');
 
   const reflection = params.pnlBps > 0
     ? 'Logging the win and the lessons.'
@@ -207,9 +205,7 @@ P&L: ${pnl}
 
 Token: #${params.tokenId}
 Time: ${formatTimestampUtc(params.timestamp)}
-Tx: ${txUrl}
-
-Note: ${reflection}`;
+${txLine ? `Tx: ${txLine}\n\n` : ''}Note: ${reflection}`;
 
   return trimForPlatform(body, platform);
 }
