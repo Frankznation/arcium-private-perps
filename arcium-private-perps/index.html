@@ -96,14 +96,7 @@
             overflow-x: auto;
             margin: 20px 0;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-        
-        .highlight {
-            background: #fff3cd;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: bold;
+            font-size: 14px;
         }
         
         .link-button {
@@ -125,16 +118,6 @@
         
         .link-button.secondary {
             background: #764ba2;
-        }
-        
-        .architecture-diagram {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            font-family: monospace;
-            overflow-x: auto;
         }
         
         .privacy-benefit {
@@ -167,13 +150,20 @@
             margin: 5px;
         }
         
-        ul {
-            margin-left: 20px;
-            margin-top: 10px;
+        .repo-link {
+            background: #24292e;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
         }
         
-        li {
-            margin-bottom: 8px;
+        .repo-link a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -191,6 +181,13 @@
         </header>
         
         <div class="content">
+            <div class="repo-link">
+                <strong>📦 GitHub Repository:</strong><br>
+                <a href="https://github.com/Frankznation/arcium-private-perps" target="_blank">
+                    https://github.com/Frankznation/arcium-private-perps
+                </a>
+            </div>
+            
             <section class="section">
                 <h2>🎯 Overview</h2>
                 <p>
@@ -204,7 +201,7 @@
                     <p>
                         Traditional perpetuals platforms expose trader intent through visible positions and orders, enabling:
                     </p>
-                    <ul>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
                         <li><strong>Copy-trading:</strong> Others can see and copy successful strategies</li>
                         <li><strong>Targeted liquidations:</strong> Adversaries can target specific positions</li>
                         <li><strong>Front-running:</strong> MEV bots can exploit order flow</li>
@@ -218,37 +215,6 @@
                         <strong>Arcium Private Perps</strong> solves these issues by keeping position details, order intent, 
                         and liquidation risk private while maintaining transparency for settlement.
                     </p>
-                </div>
-            </section>
-            
-            <section class="section">
-                <h2>🏗️ Architecture</h2>
-                <div class="architecture-diagram">
-                    <pre>
-┌─────────────────────────────────────────┐
-│         Frontend (React/Next.js)       │
-│  • Private Position Opening            │
-│  • Wallet Integration                  │
-│  • Real-time PnL Display               │
-└────────────────┬──────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────┐
-│      Solana Program (Anchor/Rust)      │
-│  • Encrypted Position Storage          │
-│  • Encrypted Order Management          │
-│  • Private Liquidation Checks          │
-│  • Public PnL Settlement               │
-└────────────────┬──────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────┐
-│         Arcium Network                   │
-│  • Privacy-Preserving Computation       │
-│  • Encrypted Data Processing            │
-│  • Selective Result Disclosure          │
-└─────────────────────────────────────────┘
-                    </pre>
                 </div>
             </section>
             
@@ -294,12 +260,11 @@
                 
                 <h3>Solana Program (Anchor/Rust)</h3>
                 <div class="code-block">
-pub fn open_private_position(
+<span style="color: #569cd6">pub fn</span> <span style="color: #dcdcaa">open_private_position</span>(
     ctx: Context&lt;OpenPosition&gt;,
-    encrypted_position_data: Vec&lt;u8&gt;, // Encrypted via Arcium
-    position_hash: [u8; 32], // Hash for verification
+    encrypted_position_data: Vec&lt;u8&gt;,
+    position_hash: [u8; 32],
 ) -&gt; Result&lt;()&gt; {
-    // Store encrypted data - no one can see position details
     position.encrypted_data = encrypted_position_data;
     position.position_hash = position_hash;
     Ok(())
@@ -308,17 +273,16 @@ pub fn open_private_position(
                 
                 <h3>Arcium Integration</h3>
                 <div class="code-block">
-const arcium = new ArciumSDK({
-  network: 'mainnet',
+<span style="color: #569cd6">const</span> arcium = <span style="color: #569cd6">new</span> <span style="color: #4ec9b0">ArciumSDK</span>({
+  network: <span style="color: #ce9178">'mainnet'</span>,
   apiKey: process.env.ARCIUM_API_KEY,
 });
 
-// Encrypt position data
-const encryptedPosition = await arcium.encrypt({
-  size: 1000, // SOL
-  direction: 'long',
-  entryPrice: 150,
-  leverage: 10,
+<span style="color: #569cd6">const</span> encryptedPosition = <span style="color: #569cd6">await</span> arcium.encrypt({
+  size: <span style="color: #b5cea8">1000</span>,
+  direction: <span style="color: #ce9178">'long'</span>,
+  entryPrice: <span style="color: #b5cea8">150</span>,
+  leverage: <span style="color: #b5cea8">10</span>,
 });
                 </div>
             </section>
@@ -349,75 +313,16 @@ const encryptedPosition = await arcium.encrypt({
             </section>
             
             <section class="section">
-                <h2>🚀 Getting Started</h2>
-                <div class="code-block">
-# Clone the repository
-git clone https://github.com/Frankznation/arcium-private-perps.git
-cd arcium-private-perps
-
-# Install dependencies
-npm install
-
-# Build Solana program
-anchor build
-
-# Run tests
-anchor test
-                </div>
-            </section>
-            
-            <section class="section">
-                <h2>📚 Documentation</h2>
-                <p>Comprehensive documentation is available in the repository:</p>
-                <ul>
-                    <li><strong>README.md</strong> - Complete project overview</li>
-                    <li><strong>docs/ARCIUM_INTEGRATION.md</strong> - Detailed Arcium integration guide</li>
-                    <li><strong>docs/ARCHITECTURE.md</strong> - System architecture documentation</li>
-                    <li><strong>SUBMISSION.md</strong> - Submission summary</li>
-                </ul>
-            </section>
-            
-            <section class="section">
                 <h2>🔗 Links</h2>
                 <a href="https://github.com/Frankznation/arcium-private-perps" class="link-button" target="_blank">
                     📦 GitHub Repository
                 </a>
-                <a href="https://docs.arcium.com" class="link-button secondary" target="_blank">
-                    📖 Arcium Documentation
+                <a href="https://github.com/Frankznation/arcium-private-perps/blob/main/README.md" class="link-button secondary" target="_blank">
+                    📖 README
                 </a>
-                <a href="https://docs.solana.com" class="link-button secondary" target="_blank">
-                    📖 Solana Documentation
+                <a href="https://github.com/Frankznation/arcium-private-perps/blob/main/docs/ARCIUM_INTEGRATION.md" class="link-button secondary" target="_blank">
+                    🔐 Arcium Integration Guide
                 </a>
-            </section>
-            
-            <section class="section">
-                <h2>⭐ Judging Criteria Alignment</h2>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>Innovation ⭐⭐⭐⭐⭐</h4>
-                        <p>First-of-its-kind private perps platform on Solana with novel Arcium integration</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <h4>Technical Implementation ⭐⭐⭐⭐⭐</h4>
-                        <p>Clean, well-documented code with proper Arcium integration</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <h4>User Experience ⭐⭐⭐⭐⭐</h4>
-                        <p>Intuitive UI with clear privacy indicators and seamless wallet integration</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <h4>Impact ⭐⭐⭐⭐⭐</h4>
-                        <p>Reduces MEV, enables deeper liquidity, protects trader strategies</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <h4>Clarity ⭐⭐⭐⭐⭐</h4>
-                        <p>Comprehensive documentation with clear explanation of Arcium benefits</p>
-                    </div>
-                </div>
             </section>
         </div>
         
