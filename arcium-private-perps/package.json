@@ -2,12 +2,13 @@
   "name": "arcium-private-perps",
   "version": "1.0.0",
   "description": "Private Perpetuals Trading Platform using Arcium on Solana",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
-    "build": "anchor build",
+    "build": "echo 'Static site - no build needed'",
+    "start": "echo 'Static site - serve index.html'",
+    "dev": "echo 'Open index.html in browser'",
     "test": "anchor test",
     "deploy": "anchor deploy",
-    "dev": "next dev",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },

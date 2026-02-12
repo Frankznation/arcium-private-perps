@@ -1,0 +1,7 @@
+# Ignore parent directory files that might cause issues
+../src/
+../scripts/
+../node_modules/
+../.env*
+../package.json
+../package-lock.json
