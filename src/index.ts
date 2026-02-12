@@ -631,36 +631,40 @@ async function main(): Promise<void> {
 
     // Optional launch announcement
     if (config.postLaunchAnnouncement) {
-      const walletUrl = getBasescanAddressUrl(getWalletAddress());
-      const launchParams = { walletAddress: walletUrl };
       try {
-        const tweetContent = generateLaunchPostForPlatform(launchParams, 'TWITTER');
-        const tweetId = await postTweetWithRateLimit(tweetContent);
-        if (tweetId) {
+        const walletUrl = getBasescanAddressUrl(getWalletAddress());
+        const launchParams = { walletAddress: walletUrl };
+        try {
+          const tweetContent = generateLaunchPostForPlatform(launchParams, 'TWITTER');
+          const tweetId = await postTweetWithRateLimit(tweetContent);
+          if (tweetId) {
+            await recordSocialPost({
+              platform: 'TWITTER',
+              post_id: tweetId,
+              content: tweetContent,
+              post_type: 'LAUNCH',
+              timestamp: new Date(),
+            });
+          }
+        } catch (error) {
+          logger.error(`Failed to post launch tweet: ${error}`);
+        }
+
+        try {
+          const castContent = generateLaunchPostForPlatform(launchParams, 'FARCASTER');
+          const castHash = await postCastWithRateLimit(castContent);
           await recordSocialPost({
-            platform: 'TWITTER',
-            post_id: tweetId,
-            content: tweetContent,
+            platform: 'FARCASTER',
+            post_id: castHash,
+            content: castContent,
             post_type: 'LAUNCH',
             timestamp: new Date(),
           });
+        } catch (error) {
+          logger.error(`Failed to post launch cast: ${error}`);
         }
       } catch (error) {
-        logger.error(`Failed to post launch tweet: ${error}`);
-      }
-
-      try {
-        const castContent = generateLaunchPostForPlatform(launchParams, 'FARCASTER');
-        const castHash = await postCastWithRateLimit(castContent);
-        await recordSocialPost({
-          platform: 'FARCASTER',
-          post_id: castHash,
-          content: castContent,
-          post_type: 'LAUNCH',
-          timestamp: new Date(),
-        });
-      } catch (error) {
-        logger.error(`Failed to post launch cast: ${error}`);
+        logger.warn(`Wallet not available for launch announcement: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 

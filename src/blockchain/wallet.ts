@@ -38,6 +38,7 @@ export function initializeWallet(): void {
 export function getWalletClient(): WalletClient {
   if (!walletClient) {
     if (!config.privateKey) {
+      // In preview/demo mode, throw error only if actually trying to use wallet
       throw new Error('Wallet client not initialized. PRIVATE_KEY is required for wallet operations.');
     }
     initializeWallet();
@@ -51,6 +52,7 @@ export function getWalletClient(): WalletClient {
 export function getAccount(): Account {
   if (!account) {
     if (!config.privateKey) {
+      // In preview/demo mode, throw error only if actually trying to use wallet
       throw new Error('Account not initialized. PRIVATE_KEY is required for wallet operations.');
     }
     initializeWallet();
