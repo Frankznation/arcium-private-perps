@@ -35,36 +35,43 @@ export function initializeWallet(): void {
 /**
  * Get wallet client
  */
-export function getWalletClient(): WalletClient {
+export function getWalletClient(): WalletClient | null {
   if (!walletClient) {
     if (!config.privateKey) {
-      // In preview/demo mode, throw error only if actually trying to use wallet
+      // In preview/demo mode, return null instead of throwing
+      if (process.env.VERCEL_ENV === 'preview' || process.env.SKIP_ENV_VALIDATION === 'true') {
+        return null;
+      }
       throw new Error('Wallet client not initialized. PRIVATE_KEY is required for wallet operations.');
     }
     initializeWallet();
   }
-  return walletClient!;
+  return walletClient;
 }
 
 /**
  * Get account
  */
-export function getAccount(): Account {
+export function getAccount(): Account | null {
   if (!account) {
     if (!config.privateKey) {
-      // In preview/demo mode, throw error only if actually trying to use wallet
+      // In preview/demo mode, return null instead of throwing
+      if (process.env.VERCEL_ENV === 'preview' || process.env.SKIP_ENV_VALIDATION === 'true') {
+        return null;
+      }
       throw new Error('Account not initialized. PRIVATE_KEY is required for wallet operations.');
     }
     initializeWallet();
   }
-  return account!;
+  return account;
 }
 
 /**
  * Get wallet address
  */
-export function getWalletAddress(): `0x${string}` {
-  return getAccount().address;
+export function getWalletAddress(): `0x${string}` | null {
+  const acc = getAccount();
+  return acc ? acc.address : null;
 }
 
 /**
