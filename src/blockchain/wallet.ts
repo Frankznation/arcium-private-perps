@@ -13,6 +13,11 @@ let account: Account | null = null;
  */
 export function initializeWallet(): void {
   if (!config.privateKey) {
+    // Skip wallet initialization in preview/demo mode or when PRIVATE_KEY is not set
+    if (process.env.VERCEL_ENV === 'preview' || process.env.SKIP_ENV_VALIDATION === 'true') {
+      logger.warn('Wallet initialization skipped (preview/demo mode)');
+      return;
+    }
     throw new Error('PRIVATE_KEY environment variable is required');
   }
 
@@ -32,6 +37,9 @@ export function initializeWallet(): void {
  */
 export function getWalletClient(): WalletClient {
   if (!walletClient) {
+    if (!config.privateKey) {
+      throw new Error('Wallet client not initialized. PRIVATE_KEY is required for wallet operations.');
+    }
     initializeWallet();
   }
   return walletClient!;
@@ -42,6 +50,9 @@ export function getWalletClient(): WalletClient {
  */
 export function getAccount(): Account {
   if (!account) {
+    if (!config.privateKey) {
+      throw new Error('Account not initialized. PRIVATE_KEY is required for wallet operations.');
+    }
     initializeWallet();
   }
   return account!;
