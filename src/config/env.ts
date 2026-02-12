@@ -115,6 +115,20 @@ const requiredVars = [
 ];
 
 export function validateConfig(): void {
+  // Auto-skip validation if running in Vercel preview or if explicitly disabled
+  const skipValidation = process.env.SKIP_ENV_VALIDATION === 'true' || 
+    process.env.VERCEL_ENV === 'preview' || 
+    !process.env.PRIVATE_KEY;
+  
+  if (skipValidation) {
+    if (process.env.VERCEL_ENV === 'preview' || !process.env.PRIVATE_KEY) {
+      console.warn('[config] Environment validation skipped (preview/demo mode)');
+    } else {
+      console.warn('[config] Environment validation skipped (SKIP_ENV_VALIDATION=true)');
+    }
+    return;
+  }
+
   const missing = requiredVars.filter(
     (varName) => !process.env[varName]
   );
